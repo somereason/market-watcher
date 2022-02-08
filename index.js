@@ -2,7 +2,11 @@ const express = require('express')
 const axios = require('axios')
 const config = require('./config')
 const app = express()
-const port = 8088
+const path = require("path")
+
+app.set('views', path.join(__dirname, 'views/'));
+app.engine('.html', require('ejs').renderFile);
+app.set('view engine', 'html');
 
 async function getTokenPrice() {
     const tokens = config.token
@@ -37,7 +41,7 @@ async function getStockPrice() {
         if (i >= stocks2Query.length)
             continue
         let info = stocks[i].split("~");
-        result.push({ name: stocks2Query[i].name, price: info[3], rate: info[5] })
+        result.push({ name: stocks2Query[i].name, value: info[3], rate: info[5] })
     }
 
     return result;
@@ -45,15 +49,15 @@ async function getStockPrice() {
 app.get('/', async (req, res) => {
     let result = []
     let [token, dollar, stock] = await Promise.all([getTokenPrice(), getDollarPrice(), getStockPrice()])
-    result.push(...token);
-    result.push(...dollar);
-    result.push(...stock);
+    result.push(...token)
+    result.push(...dollar)
+    result.push(...stock)
 
-    res.send(result)
+    res.render("index", { items: result })
 })
 
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+app.listen(config.port, "0.0.0.0", () => {
+    console.log(`Example app listening on port ${config.port}`)
 })
 
 //http://qt.gtimg.cn/r=0.8409869808238q=s_sz000559,s_sh600895,s_sz002048,s_sz002085,s_sz002126,s_sz002284,s_sz002434,s_sz002472,s_sz002488
