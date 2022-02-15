@@ -19,7 +19,7 @@ async function getTokenPrice() {
     for (let i = 0; i < tokens.length; i++) {
         let close = tokenResponse[i].data.data[0].close;
         let open = tokenResponse[i].data.data[0].open;
-        tokenResult.push({ name: tokens[i].name, value: close, rate: ((close - open) / open).toFixed(2) });
+        tokenResult.push({ name: tokens[i].name, value: close, rate: (100 * ((close - open) / open)).toFixed(2) });
     }
     return tokenResult;
 }
