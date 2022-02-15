@@ -12,12 +12,14 @@ async function getTokenPrice() {
     const tokens = config.token
     let tokenRequest = []
     tokens.forEach(a => {
-        tokenRequest.push(axios.get("https://api.huobi.pro/market/history/kline?period=1min&size=1&symbol=" + a.symbol))
+        tokenRequest.push(axios.get("https://api.huobi.pro/market/history/kline?period=1day&size=1&symbol=" + a.symbol))
     })
     let tokenResponse = await Promise.all(tokenRequest);
     let tokenResult = [];
     for (let i = 0; i < tokens.length; i++) {
-        tokenResult.push({ name: tokens[i].name, value: tokenResponse[i].data.data[0].close });
+        let close = tokenResponse[i].data.data[0].close;
+        let open = tokenResponse[i].data.data[0].open;
+        tokenResult.push({ name: tokens[i].name, value: close, rate: ((close - open) / open).toFixed(2) });
     }
     return tokenResult;
 }
